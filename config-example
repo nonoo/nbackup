@@ -1,0 +1,16 @@
+dsthost=user@host
+dstpath=/home/backups
+sshport=22
+# Do run rsync?
+rsync=0
+dryrunrsync=1
+# Do run rdiff-backup?
+rdiffbackup=1
+# Remove older increments than this
+removeoldertime=2W
+# Use this option to create the rdiff-backup repo after you have done rsync copy
+rdiffbackupforce=0
+
+logfile=/var/log/nbackup.log
+redirectlogscript=/opt/logrotate/redirectlog.src.sh
+logrotateifneeded=/opt/logrotate/logrotateifneeded.sh
