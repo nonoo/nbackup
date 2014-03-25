@@ -51,4 +51,4 @@ backup() {
 	echo "*** backing up $src to $dst finished."
 }
 
-backup /etc/ $dstpath/etc
+source config-paths
