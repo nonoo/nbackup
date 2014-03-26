@@ -33,13 +33,11 @@ backup() {
 			dryrunparam="--dry-run"
 		fi
 
-		#ssh -p $sshport $dsthost "[ ! -d $dst ]"
-		#direxists=$?
-		#if [ "$direxists" = "0" ]; then
-			echo "*** running rsync"
-			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--rsh "ssh -p $sshport" --progress --ignore-errors --delete $src $dsthost:$dst
-		#fi
+		echo "*** checking if $dst exists"
+		ssh -p $sshport $dsthost "mkdir -p $dst"
+		echo "*** running rsync"
+		rsync $dryrunparam --verbose --compress-level=9 --archive \
+			--rsh "ssh -p $sshport" --progress --ignore-errors --delete $src $dsthost:$dst
 	fi
 
 	if [ $rdiffbackup -eq 1 ]; then
@@ -50,6 +48,8 @@ backup() {
 			forceparam="--force"
 		fi
 
+		echo "*** checking if $dst exists"
+		ssh -p $sshport $dsthost "mkdir -p $dst"
 		echo "*** running rdiff-backup"
 		rdiff-backup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dst
 		echo "*** running rdiff-backup, listing increments"
