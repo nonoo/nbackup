@@ -12,5 +12,4 @@ removeoldertime=2W
 rdiffbackupforce=0
 
 logfile=/var/log/nbackup.log
-redirectlogscript=/opt/logrotate/redirectlog.src.sh
-logrotateifneeded=/opt/logrotate/logrotateifneeded.sh
+nlogrotatepath=/opt/nlogrotate

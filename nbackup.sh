@@ -1,10 +1,10 @@
 #!/bin/sh
 
 scriptname=`basename $0`
-scriptdir=${0/$scriptname/}
+scriptdir=${0%$scriptname}
 
-source $scriptdir/config
-source $redirectlogscript
+. $scriptdir/config
+. $nlogrotatepath/redirectlog.src.sh
 
 if [ "$1" = "quiet" ]; then
 	quietmode=1
@@ -49,6 +49,8 @@ backup() {
 	fi
 
 	echo "*** backing up $src to $dst finished."
+
+	checklogsize
 }
 
-source config-paths
+. $scriptdir/config-paths
