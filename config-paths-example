@@ -1,2 +1,7 @@
 # Insert your backup paths here. Format: backup [srcdir] [dstdir]
-backup /etc/ $dstpath/etc
+backup /etc $dstpath/etc
+backup /usr/local $dstpath/usr/local
+backup /root $dstpath/root
+backup /home $dstpath/home
+backup /opt $dstpath/opt
+backup /var/www $dstpath/var/www
