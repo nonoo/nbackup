@@ -1,4 +1,4 @@
-# Insert your backup paths here. Format: backup [srcdir] [dstdir]
+# Insert your backup paths here. Format: backup [srcdir] [dstdir] (sshport)
 
 dstpath="user@host:/home/backups"
 sshport=22
