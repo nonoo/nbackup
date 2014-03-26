@@ -11,6 +11,16 @@ if [ "$1" = "quiet" ]; then
 	redirectlog
 fi
 
+if [ $rsync -eq 1 ] && [ $rdiffbackup -eq 1 ]; then
+	echo "*** error: both rsync and rdiff-backup usage is turned on. can't do both."
+	exit 1
+fi
+
+if [ $rsync -eq 0 ] && [ $rdiffbackup -eq 0 ]; then
+	echo "*** warning: both rsync and rdiff-backup usage is turned off." \
+		"nbackup won't do anything this way."
+fi
+
 backup() {
 	src=$1
 	dst=$2
@@ -44,8 +54,10 @@ backup() {
 		rdiff-backup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dst
 		echo "*** running rdiff-backup, listing increments"
 		rdiff-backup --remote-schema "$remoteschema" --list-increments $dsthost::$dst
-		echo "*** running rdiff-backup, removing older increments"
-		rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dst
+		if [ ! -z "$removeoldertime" ]; then
+			echo "*** running rdiff-backup, removing older increments"
+			rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dst
+		fi
 	fi
 
 	echo "*** backing up $src to $dst finished."
