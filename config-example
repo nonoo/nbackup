@@ -1,7 +1,3 @@
-dsthost=user@host
-dstpath=/home/backups
-sshport=22
-
 # Do run rsync?
 rsync=0
 dryrunrsync=1

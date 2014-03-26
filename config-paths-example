@@ -1,7 +1,11 @@
 # Insert your backup paths here. Format: backup [srcdir] [dstdir]
-backup /etc $dstpath/etc
-backup /usr/local $dstpath/usr/local
-backup /root $dstpath/root
-backup /home $dstpath/home
-backup /opt $dstpath/opt
-backup /var/www $dstpath/var/www
+
+dstpath="user@host:/home/backups"
+sshport=22
+
+backup /etc $dstpath/etc $sshport
+backup /usr/local $dstpath/usr/local $sshport
+backup /root $dstpath/root $sshport
+backup /home $dstpath/home $sshport
+backup /opt $dstpath/opt $sshport
+backup /var/www $dstpath/var/www $sshport

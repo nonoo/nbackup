@@ -21,42 +21,91 @@ if [ $rsync -eq 0 ] && [ $rdiffbackup -eq 0 ]; then
 		"nbackup won't do anything this way."
 fi
 
+checkdstdirexists() {
+	local dsthost=$1
+	local dstdir=$2
+	local sshport=$3
+
+	echo "*** checking if $dst exists"
+	if [ -z "$dsthost" ]; then
+		mkdir -p $dstdir
+	else
+		ssh -p $sshport $dsthost "mkdir -p $dstdir"
+	fi
+}
+
 backup() {
-	src=$1
-	dst=$2
+	local src=$1
+	local dst=$2
+	local sshport=$3
+
+	if [ -z "$sshport" ]; then
+		sshport=22
+	fi
 
 	echo "*** backing up $src to $dst"
 
+	local dsthost
+	local dstdir
+	if [ -z "`echo $dst | grep ':'`" ]; then
+		dstdir=$dst
+	else
+		dsthost=`echo $dst | cut -d':' -f1`
+		dstdir=`echo $dst | cut -d':' -f2`
+	fi
+
 	if [ $rsync -eq 1 ]; then
-		dryrunparam=
+		local dryrunparam
 		if [ $dryrunrsync -eq 1 ]; then
 			dryrunparam="--dry-run"
 		fi
 
-		echo "*** checking if $dst exists"
-		ssh -p $sshport $dsthost "mkdir -p $dst"
+		checkdstdirexists "$dsthost" "$dstdir" "$sshport"
+
 		echo "*** running rsync"
-		rsync $dryrunparam --verbose --compress-level=9 --archive \
-			--rsh "ssh -p $sshport" --progress --ignore-errors --delete $src $dsthost:$dst
+		if [ ! -z "$dsthost" ]; then
+			rsync $dryrunparam --verbose --compress-level=9 --archive \
+				--rsh "ssh -p $sshport" --progress --ignore-errors --delete $src $dsthost:$dstdir
+		else
+			rsync $dryrunparam --verbose --compress-level=9 --archive \
+				--progress --ignore-errors --delete $src $dstdir
+		fi
 	fi
 
 	if [ $rdiffbackup -eq 1 ]; then
-		remoteschema="ssh -C -p $sshport %s rdiff-backup --server"
+		local remoteschema
+		if [ ! -z "$dsthost" ]; then
+			remoteschema="ssh -C -p $sshport %s rdiff-backup --server"
+		fi
 
-		forceparam=
+		local forceparam
 		if [ $rdiffbackupforce -eq 1 ]; then
 			forceparam="--force"
 		fi
 
-		echo "*** checking if $dst exists"
-		ssh -p $sshport $dsthost "mkdir -p $dst"
+		checkdstdirexists "$dsthost" "$dstdir" "$sshport"
+
 		echo "*** running rdiff-backup"
-		rdiff-backup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dst
+		if [ ! -z "$dsthost" ]; then
+			rdiff-backup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
+		else
+			rdiff-backup $forceparam $src $dstdir
+		fi
+
 		echo "*** running rdiff-backup, listing increments"
-		rdiff-backup --remote-schema "$remoteschema" --list-increments $dsthost::$dst
+		if [ ! -z "$dsthost" ]; then
+			rdiff-backup --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
+		else
+			rdiff-backup --list-increments $dstdir
+		fi
+
 		if [ ! -z "$removeoldertime" ]; then
 			echo "*** running rdiff-backup, removing older increments"
-			rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dst
+			if [ ! -z "$dsthost" ]; then
+				rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
+			else
+				rdiff-backup --remove-older-than $removeoldertime --force $dstdir
+			fi
 		fi
 	fi
 

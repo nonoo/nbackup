@@ -1,8 +1,8 @@
 nbackup
 =======
 
-A simple backup script which uses rsync or rdiff-backup over SSH to back up
-directories.
+A simple backup script which uses rsync or rdiff-backup (optionally over SSH)
+to back up directories.
 
 #### Usage
 
