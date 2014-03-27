@@ -9,3 +9,4 @@ backup /root $dstpath/root $sshport
 backup /home $dstpath/home $sshport
 backup /opt $dstpath/opt $sshport
 backup /var/www $dstpath/var/www $sshport
+backup /var/lib/mysql $dstpath/var/lib/mysql $sshport
