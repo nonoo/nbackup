@@ -101,7 +101,7 @@ backup() {
 		fi
 
 		if [ ! -z "$removeoldertime" ]; then
-			echo "*** running rdiff-backup, removing older increments"
+			echo "*** running rdiff-backup, removing older increments than $removeoldertime"
 			if [ ! -z "$dsthost" ]; then
 				rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
 			else
