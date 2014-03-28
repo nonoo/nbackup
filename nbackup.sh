@@ -66,10 +66,10 @@ backup() {
 		echo "*** running rsync"
 		if [ ! -z "$dsthost" ]; then
 			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--rsh "ssh -p $sshport" --progress --ignore-errors --delete $src $dsthost:$dstdir
+				--rsh "ssh -p $sshport" --ignore-errors --delete $src $dsthost:$dstdir
 		else
 			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--progress --ignore-errors --delete $src $dstdir
+				--ignore-errors --delete $src $dstdir
 		fi
 	fi
 
