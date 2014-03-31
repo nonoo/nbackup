@@ -14,6 +14,7 @@ fi
 
 if [ $rsync -eq 1 ] && [ $rdiffbackup -eq 1 ]; then
 	echo "*** error: both rsync and rdiff-backup usage is turned on. can't do both."
+	checklogsize
 	exit 1
 fi
 
