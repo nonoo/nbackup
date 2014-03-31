@@ -8,3 +8,5 @@ to back up directories.
 
 Copy *config-example* to *config* and edit it, then copy *config-paths-example*
 to *config-paths* and add your directories to back up.
+
+You'll need [nlogrotate](https://github.com/nonoo/nlogrotate).
