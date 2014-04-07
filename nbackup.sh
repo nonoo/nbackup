@@ -40,6 +40,7 @@ backup() {
 	local src=$1
 	local dst=$2
 	local sshport=$3
+	local error=0
 
 	if [ -z "$sshport" ]; then
 		sshport=22
@@ -72,6 +73,9 @@ backup() {
 			rsync $dryrunparam --verbose --compress-level=9 --archive \
 				--ignore-errors --delete $src $dstdir
 		fi
+		if [ $? -ne 0 ]; then
+			error=1
+		fi
 	fi
 
 	if [ $rdiffbackup -eq 1 ]; then
@@ -93,12 +97,18 @@ backup() {
 		else
 			rdiff-backup $forceparam $src $dstdir
 		fi
+		if [ $? -ne 0 ]; then
+			error=1
+		fi
 
 		echo "*** running rdiff-backup, listing increments"
 		if [ ! -z "$dsthost" ]; then
 			rdiff-backup --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
 		else
 			rdiff-backup --list-increments $dstdir
+		fi
+		if [ $? -ne 0 ]; then
+			error=1
 		fi
 
 		if [ ! -z "$removeoldertime" ]; then
@@ -108,10 +118,17 @@ backup() {
 			else
 				rdiff-backup --remove-older-than $removeoldertime --force $dstdir
 			fi
+			if [ $? -ne 0 ]; then
+				error=1
+			fi
 		fi
 	fi
 
 	echo "*** backing up $src to $dst finished."
+
+	if [ $error != 0 ] && [ "$senderrormailcommand" != "" ]; then
+		eval $senderrormailcommand
+	fi
 
 	checklogsize
 }

@@ -11,3 +11,6 @@ rdiffbackupforce=0
 
 logfile=/var/log/nbackup.log
 nlogrotatepath=/opt/nlogrotate
+
+# This command is executed when there was an error
+senderrormailcommand="echo \"Error while backing up \$src to \$dst, see attached log file!\" | mail -s \"[`hostname`] nbackup \$src error\" -a \$logfile nonoo@nonoo.hu"
