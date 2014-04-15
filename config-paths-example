@@ -10,3 +10,4 @@ backup /home $dstpath/home $sshport
 backup /opt $dstpath/opt $sshport
 backup /var/www $dstpath/var/www $sshport
 backup /var/lib/mysql $dstpath/var/lib/mysql $sshport
+backup /var/spool/cron/crontabs $dstpath/var/spool/cron/crontabs $sshport
