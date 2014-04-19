@@ -126,7 +126,7 @@ backup() {
 
 	echo "*** backing up $src to $dst finished."
 
-	if [ $error != 0 ] && [ "$senderrormailcommand" != "" ]; then
+	if [ $error != 0 ] && [ "$senderrormailcommand" != "" ] && [ "$quietmode" != "1" ]; then
 		eval $senderrormailcommand
 	fi
 
