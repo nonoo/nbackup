@@ -1,3 +1,5 @@
+# Path to the ssh binary
+ssh=/bin/ssh
 # Do run rsync?
 rsync=0
 dryrunrsync=1

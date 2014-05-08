@@ -1,6 +1,6 @@
 #!/bin/sh
 
-self=`readlink -f "$0"`
+self=`readlink "$0"`
 scriptname=`basename "$self"`
 scriptdir=${self%$scriptname}
 
@@ -32,7 +32,7 @@ checkdstdirexists() {
 	if [ -z "$dsthost" ]; then
 		mkdir -p $dstdir
 	else
-		ssh -p $sshport $dsthost "mkdir -p $dstdir"
+		$ssh -p $sshport $dsthost "mkdir -p $dstdir"
 	fi
 }
 
@@ -68,7 +68,7 @@ backup() {
 		echo "*** running rsync"
 		if [ ! -z "$dsthost" ]; then
 			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--rsh "ssh -p $sshport" --ignore-errors --delete $src $dsthost:$dstdir
+				--rsh "$ssh -p $sshport" --ignore-errors --delete $src $dsthost:$dstdir
 		else
 			rsync $dryrunparam --verbose --compress-level=9 --archive \
 				--ignore-errors --delete $src $dstdir
@@ -81,7 +81,7 @@ backup() {
 	if [ $rdiffbackup -eq 1 ]; then
 		local remoteschema
 		if [ ! -z "$dsthost" ]; then
-			remoteschema="ssh -C -p $sshport %s rdiff-backup --server"
+			remoteschema="$ssh -C -p $sshport %s rdiff-backup --server"
 		fi
 
 		local forceparam
