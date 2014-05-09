@@ -1,6 +1,9 @@
 #!/bin/sh
 
 self=`readlink "$0"`
+if [ -z "$self" ]; then
+	self=$0
+fi
 scriptname=`basename "$self"`
 scriptdir=${self%$scriptname}
 
@@ -81,7 +84,7 @@ backup() {
 	if [ $rdiffbackup -eq 1 ]; then
 		local remoteschema
 		if [ ! -z "$dsthost" ]; then
-			remoteschema="$ssh -C -p $sshport %s rdiff-backup --server"
+			remoteschema="$ssh -C -p $sshport %s $rdiffbackup --server"
 		fi
 
 		local forceparam
@@ -93,9 +96,9 @@ backup() {
 
 		echo "*** running rdiff-backup"
 		if [ ! -z "$dsthost" ]; then
-			rdiff-backup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
+			$rdiffbackup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
 		else
-			rdiff-backup $forceparam $src $dstdir
+			$rdiffbackup $forceparam $src $dstdir
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
@@ -103,9 +106,9 @@ backup() {
 
 		echo "*** running rdiff-backup, listing increments"
 		if [ ! -z "$dsthost" ]; then
-			rdiff-backup --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
+			$rdiffbackup --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
 		else
-			rdiff-backup --list-increments $dstdir
+			$rdiffbackup --list-increments $dstdir
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
@@ -114,9 +117,9 @@ backup() {
 		if [ ! -z "$removeoldertime" ]; then
 			echo "*** running rdiff-backup, removing older increments than $removeoldertime"
 			if [ ! -z "$dsthost" ]; then
-				rdiff-backup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
+				$rdiffbackup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
 			else
-				rdiff-backup --remove-older-than $removeoldertime --force $dstdir
+				$rdiffbackup --remove-older-than $removeoldertime --force $dstdir
 			fi
 			if [ $? -ne 0 ]; then
 				error=1
