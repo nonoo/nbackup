@@ -1,7 +1,7 @@
 # Path to the rdiff-backup binary
-rdiffbackup=/usr/bin/rdiff-backup
+rdiffbackuppath=/usr/bin/rdiff-backup
 # Path to the ssh binary
-ssh=/bin/ssh
+ssh=/usr/bin/ssh
 # Do run rsync?
 rsync=0
 dryrunrsync=1

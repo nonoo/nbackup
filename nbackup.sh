@@ -84,7 +84,7 @@ backup() {
 	if [ $rdiffbackup -eq 1 ]; then
 		local remoteschema
 		if [ ! -z "$dsthost" ]; then
-			remoteschema="$ssh -C -p $sshport %s $rdiffbackup --server"
+			remoteschema="$ssh -C -p $sshport %s rdiff-backup --server"
 		fi
 
 		local forceparam
@@ -96,9 +96,9 @@ backup() {
 
 		echo "*** running rdiff-backup"
 		if [ ! -z "$dsthost" ]; then
-			$rdiffbackup $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
+			$rdiffbackuppath $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
 		else
-			$rdiffbackup $forceparam $src $dstdir
+			$rdiffbackuppath $forceparam $src $dstdir
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
@@ -106,9 +106,9 @@ backup() {
 
 		echo "*** running rdiff-backup, listing increments"
 		if [ ! -z "$dsthost" ]; then
-			$rdiffbackup --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
+			$rdiffbackuppath --remote-schema "$remoteschema" --list-increments $dsthost::$dstdir
 		else
-			$rdiffbackup --list-increments $dstdir
+			$rdiffbackuppath --list-increments $dstdir
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
@@ -117,9 +117,9 @@ backup() {
 		if [ ! -z "$removeoldertime" ]; then
 			echo "*** running rdiff-backup, removing older increments than $removeoldertime"
 			if [ ! -z "$dsthost" ]; then
-				$rdiffbackup --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
+				$rdiffbackuppath --remote-schema "$remoteschema" --remove-older-than $removeoldertime --force $dsthost::$dstdir
 			else
-				$rdiffbackup --remove-older-than $removeoldertime --force $dstdir
+				$rdiffbackuppath --remove-older-than $removeoldertime --force $dstdir
 			fi
 			if [ $? -ne 0 ]; then
 				error=1
