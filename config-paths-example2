@@ -1,0 +1,14 @@
+# Insert your backup paths here. Format: backup [srcdir] [dstdir] (sshport)
+
+srcpath="user@host:"
+dstpath="/backups/server1"
+sshport=22
+
+backup $srcpath/etc etc $sshport
+backup $srcpath/home $dstpath/home $sshport
+backup $srcpath/usr/local $dstpath/usr/local $sshport
+backup $srcpath/root $dstpath/root $sshport
+backup $srcpath/opt $dstpath/opt $sshport
+backup $srcpath/var/www $dstpath/var/www $sshport
+backup $srcpath/var/lib/mysql $dstpath/var/lib/mysql $sshport
+backup $srcpath/var/spool/cron/crontabs $dstpath/var/spool/cron/crontabs $sshport

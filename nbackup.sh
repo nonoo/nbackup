@@ -51,6 +51,15 @@ backup() {
 
 	echo "*** backing up $src to $dst"
 
+	local srchost
+	local srcdir
+	if [ -z "`echo $src | grep ':'`" ]; then
+		srcdir=$src
+	else
+		srchost=`echo $src | cut -d':' -f1`
+		srcdir=`echo $src | cut -d':' -f2`
+	fi
+
 	local dsthost
 	local dstdir
 	if [ -z "`echo $dst | grep ':'`" ]; then
@@ -70,11 +79,21 @@ backup() {
 
 		echo "*** running rsync"
 		if [ ! -z "$dsthost" ]; then
-			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--rsh "$ssh -p $sshport" --ignore-errors --delete $src $dsthost:$dstdir
+			if [ ! -z "$srchost" ]; then
+				rsync $dryrunparam --verbose --compress-level=9 --archive \
+					--rsh "$ssh -p $sshport" --ignore-errors --delete $srchost:$srcdir $dsthost:$dstdir
+			else
+				rsync $dryrunparam --verbose --compress-level=9 --archive \
+					--rsh "$ssh -p $sshport" --ignore-errors --delete $src $dsthost:$dstdir
+			fi
 		else
-			rsync $dryrunparam --verbose --compress-level=9 --archive \
-				--ignore-errors --delete $src $dstdir
+			if [ ! -z "$srchost" ]; then
+				rsync $dryrunparam --verbose --compress-level=9 --archive \
+					--ignore-errors --delete $srchost:$srcdir $dstdir
+			else
+				rsync $dryrunparam --verbose --compress-level=9 --archive \
+					--ignore-errors --delete $src $dstdir
+			fi
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
@@ -83,7 +102,7 @@ backup() {
 
 	if [ $rdiffbackup -eq 1 ]; then
 		local remoteschema
-		if [ ! -z "$dsthost" ]; then
+		if [ ! -z "$dsthost" ] || [ ! -z "$srchost" ]; then
 			remoteschema="$ssh -C -p $sshport %s rdiff-backup --server"
 		fi
 
@@ -96,9 +115,17 @@ backup() {
 
 		echo "*** running rdiff-backup"
 		if [ ! -z "$dsthost" ]; then
-			$rdiffbackuppath $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
+			if [ ! -z "$srchost" ]; then
+				$rdiffbackuppath $forceparam --remote-schema "$remoteschema" $srchost::$srcdir $dsthost::$dstdir
+			else
+				$rdiffbackuppath $forceparam --remote-schema "$remoteschema" $src $dsthost::$dstdir
+			fi
 		else
-			$rdiffbackuppath $forceparam $src $dstdir
+			if [ ! -z "$srchost" ]; then
+				$rdiffbackuppath $forceparam --remote-schema "$remoteschema" $srchost::$srcdir $dstdir
+			else
+				$rdiffbackuppath $forceparam $src $dstdir
+			fi
 		fi
 		if [ $? -ne 0 ]; then
 			error=1
